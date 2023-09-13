@@ -48,7 +48,7 @@ function sendpropmpt(prompt1){
 
     }else{
 
-    app.get('/generate', (req, res) => {
+    app.post('/generate', (req, res) => {
          const { prompt } = req.body;
  
 
