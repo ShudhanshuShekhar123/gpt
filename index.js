@@ -21,16 +21,16 @@ const rl = readline.createInterface({
 app.use(express.json());
 
 
-function removeNewlines(text) {
-  return text.replace(/\n/g, '');
-}
+// function removeNewlines(text) {
+ 
+//     for(let i =0; i<=text.length-1;i++){
+//       console.log(text[i])
+//     }
+// }
 
 
 function sendpropmpt(prompt1){
 
-
-  
-  
     if(prompt1){
       return  axios.post('https://api.openai.com/v1/engines/text-davinci-003/completions', {
         prompt: prompt1,
@@ -51,9 +51,9 @@ function sendpropmpt(prompt1){
  
 
       axios.post('https://api.openai.com/v1/engines/text-davinci-003/completions', {
-        prompt: prompt,
-        max_tokens: 50, 
-        temperature: 0.2,
+        prompt: `generate  a  quote on ${prompt} considering  the context of word with atleast 50 chaaracters `, 
+       max_tokens:150,
+        temperature: 0.9,
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -63,9 +63,9 @@ function sendpropmpt(prompt1){
       })
         .then(response => {
           const generatedText = response.data.choices[0].text;
-          const cleanedText = removeNewlines(generatedText);
+          // const cleanedText = removeNewlines(generatedText);
           // Send the cleaned text as a JSON response
-          res.json({ generatedText: cleanedText });
+          res.json({ generatedText: generatedText });
       
         })
         .catch(error => {
@@ -90,8 +90,8 @@ rl.question('Enter your prompt: ', (prompt) => {
   console.log(x)
     x.then((response) => {
       const generatedText = response.data.choices[0].text;
-      const cleanedText = removeNewlines(generatedText);
-      console.log(`Generated Text: ${cleanedText}`);
+      // const cleanedText = removeNewlines(generatedText);
+      console.log(`Generated Text: ${generatedText}`);
       rl.close();
     })
     .catch((error) => {
