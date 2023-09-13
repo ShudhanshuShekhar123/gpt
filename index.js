@@ -1,63 +1,113 @@
 const express = require('express');
-const readline = require('readline');
 const axios = require('axios');
+const readline = require('readline');
+require('dotenv').config();
 
-// Replace 'YOUR_OPENAI_API_KEY' with your actual API key
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+
 
 const app = express();
+const port = 3000; 
+
+
+const apiKey = process.env.OPENAI_API_KEY;
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
-// Middleware to parse JSON request bodies
+
 app.use(express.json());
 
-async function askQuestion() {
-  const question = await promptUser('Enter your question (or type "exit" to quit): ');
 
-  if (question.toLowerCase() === 'exit') {
-    console.log('Goodbye!');
-    rl.close();
-    return;
-  }
+function removeNewlines(text) {
+  return text.replace(/\n/g, '');
+}
 
-  try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/engines/davinci/completions',
-      {
-        prompt: question,
-        max_tokens: 400,
-        temperature: 0.7
-      },
-      {
+
+function sendpropmpt(prompt1){
+
+
+  
+  
+    if(prompt1){
+      return  axios.post('https://api.openai.com/v1/engines/text-davinci-003/completions', {
+        prompt: prompt1,
+        max_tokens: 50, 
+        temperature: 0.2,
+      }, {
         headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          temperature: 0.1,
+        },
+      })
 
-    console.log('Response:', response.data.choices[0].text);
-    askQuestion(); // Ask another question recursively
-  } catch (error) {
-    console.error('OpenAI API error:', error.message);
-    askQuestion(); // Ask another question recursively
-  }
+    }else{
+
+    app.post('/generate', (req, res) => {
+         const { prompt } = req.body;
+ 
+
+      axios.post('https://api.openai.com/v1/engines/text-davinci-003/completions', {
+        prompt: prompt,
+        max_tokens: 50, 
+        temperature: 0.2,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          temperature: 0.1,
+        },
+      })
+        .then(response => {
+          const generatedText = response.data.choices[0].text;
+          const cleanedText = removeNewlines(generatedText);
+          // Send the cleaned text as a JSON response
+          res.json({ generatedText: cleanedText });
+      
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          res.status(500).json({ error: 'An error occurred' });
+        });
+         });
+
+    }
+
+   
+
+
 }
 
-function promptUser(question) {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer);
+
+//Using command line interface
+
+
+rl.question('Enter your prompt: ', (prompt) => {
+  let x= sendpropmpt(prompt)
+  console.log(x)
+    x.then((response) => {
+      const generatedText = response.data.choices[0].text;
+      const cleanedText = removeNewlines(generatedText);
+      console.log(`Generated Text: ${cleanedText}`);
+      rl.close();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      rl.close();
     });
-  });
-}
-
-app.listen(3000, () => {
-  console.log('Server started on http://localhost:3000');
-  console.log('Type your questions below. Type "exit" to quit.');
-  askQuestion();
 });
+
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+  sendpropmpt()
+});
+
+
+
+
+
