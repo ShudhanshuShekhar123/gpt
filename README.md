@@ -1,1 +1,1 @@
-# Chat-gpt INtegration
+# Chat-gpt Integration
