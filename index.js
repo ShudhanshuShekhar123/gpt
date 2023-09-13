@@ -40,20 +40,19 @@ function sendpropmpt(prompt1){
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
-          
           temperature: 0.1,
         },
       })
 
     }else{
 
-    app.post('/generate', (req, res) => {
+    app.get('/generate', (req, res) => {
          const { prompt } = req.body;
  
 
       axios.post('https://api.openai.com/v1/engines/text-davinci-003/completions', {
         prompt: `generate  a  quote on ${prompt} considering  the context of word with atleast 50 chaaracters `, 
-       max_tokens:150,
+         max_tokens:150,
         temperature: 0.9,
       }, {
         headers: {
@@ -100,7 +99,6 @@ rl.question('Enter your prompt: ', (prompt) => {
       rl.close();
     });
 });
-
 
 
 // Start the server
