@@ -40,6 +40,7 @@ function sendpropmpt(prompt1){
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
+          
           temperature: 0.1,
         },
       })
@@ -99,6 +100,7 @@ rl.question('Enter your prompt: ', (prompt) => {
       rl.close();
     });
 });
+
 
 
 // Start the server
